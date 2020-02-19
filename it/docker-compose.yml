@@ -1,0 +1,21 @@
+---
+version: '2.2'
+services:
+  sonarqube:
+    image: sonarqube:${SONARQUBE_VERSION:-6.6}
+    ports:
+      - "9000:9000"
+    environment:
+      ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+  auditor:
+    image: auditor:${SCANNER_VERSION}-jdk${JAVA_VERSION:-8}
+    build:
+      context: ..
+      dockerfile: it/Dockerfile-auditor
+      args:
+        JDK_VERSION: ${JAVA_VERSION:-8}
+    links:
+      - sonarqube
+    command: /bin/bash /usr/src/myapp/it/audit.sh
+    environment:
+      SCANNER_VERSION:
